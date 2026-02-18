@@ -1,0 +1,150 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#050505" />
+    
+    <!-- PWA / iOS Capabilities -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="StandIn" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <title>StandIn - Emergency Booking</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <!-- CRITICAL: Define Config BEFORE loading Tailwind -->
+    <script>
+      tailwind = {
+        config: {
+          theme: {
+            extend: {
+              fontFamily: {
+                sans: ['Inter', 'sans-serif'],
+                mono: ['JetBrains Mono', 'monospace'],
+              },
+              colors: {
+                background: '#050505', // Deepest Black
+                surface: '#0A0A0A', // Darker Surface (was #0F0F0F)
+                surfaceHighlight: '#141414', // Darker Highlight (was #1A1A1A)
+                primary: '#2dd4bf', // Neon Teal
+                secondary: '#c084fc', // Purple
+              },
+              animation: {
+                'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                'glow': 'glow 3s ease-in-out infinite alternate',
+                'float': 'float 6s ease-in-out infinite',
+                'fade-in': 'fadeIn 0.5s ease-out forwards',
+                'bounce-up': 'bounceUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+              },
+              keyframes: {
+                glow: {
+                  '0%': { boxShadow: '0 0 5px #2dd4bf' },
+                  '100%': { boxShadow: '0 0 20px #2dd4bf, 0 0 10px #c084fc' },
+                },
+                float: {
+                  '0%, 100%': { transform: 'translateY(0)' },
+                  '50%': { transform: 'translateY(-10px)' },
+                },
+                fadeIn: {
+                  '0%': { opacity: '0' },
+                  '100%': { opacity: '1' },
+                },
+                bounceUp: {
+                  '0%': { opacity: '0', transform: 'translateY(20px)' },
+                  '100%': { opacity: '1', transform: 'translateY(0)' },
+                }
+              },
+              boxShadow: {
+                'glass': '0 8px 32px rgba(0, 0, 0, 0.4)',
+                'neon': '0 0 20px rgba(45, 212, 191, 0.15)',
+              }
+            }
+          }
+        }
+      }
+    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+      /* Fallback Critical CSS */
+      body {
+        background-color: #050505;
+        color: white;
+        overflow-x: hidden;
+        margin: 0;
+        font-family: 'Inter', sans-serif;
+        -webkit-user-select: none;
+        user-select: none;
+        overscroll-behavior-y: none;
+      }
+
+      /* Manual Keyframe Definition (Backup for Tailwind) */
+      @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+      
+      .animate-fade-in {
+        animation: fadeIn 0.5s ease-out forwards;
+      }
+
+      /* Glass Borders 2.0 - Darker, subtler gradients */
+      .glass-panel {
+        background: linear-gradient(145deg, rgba(20, 20, 20, 0.4) 0%, rgba(5, 5, 5, 0.4) 100%); 
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-top: 1px solid rgba(255, 255, 255, 0.1); 
+        border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+        border-left: 1px solid rgba(255, 255, 255, 0.03);
+        border-right: 1px solid rgba(255, 255, 255, 0.03);
+        box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.02);
+      }
+      
+      .glass-panel-highlight {
+        background: linear-gradient(145deg, rgba(30, 30, 30, 0.5) 0%, rgba(10, 10, 10, 0.5) 100%); 
+        backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(255, 255, 255, 0.15); 
+        border-bottom: 1px solid rgba(0, 0, 0, 0.5);
+        border-left: 1px solid rgba(255, 255, 255, 0.05);
+        border-right: 1px solid rgba(255, 255, 255, 0.05);
+        box-shadow: 0 8px 32px -4px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+      }
+
+      /* Scrollbars */
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+      .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 4px; }
+      .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
+      
+      /* Utilities */
+      .text-glow {
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "lucide-react": "https://esm.sh/lucide-react@^0.561.0",
+    "vite": "https://esm.sh/vite@^7.3.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "@vitejs/plugin-react": "https://esm.sh/@vitejs/plugin-react@^5.1.2",
+    "vite-plugin-pwa": "https://esm.sh/vite-plugin-pwa@^1.2.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
