@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { 
   Clock, MapPin, ArrowRight, Building, Ticket, Move, Flower, Sparkles, Mic, 
@@ -285,7 +284,7 @@ export const TicketView = ({ job }: { job: Job }) => {
         )}
 
         <div className="p-10 flex-1 flex flex-col">
-            <div className="flex justify-between items-start mb-10">
+            <div className="flex justify-between items-start mb-6">
                 <div className="w-12 h-12 rounded-2xl bg-black border border-white/10 flex items-center justify-center font-black text-xs">
                     {job.studioName.substring(0,2).toUpperCase()}
                 </div>
@@ -295,8 +294,8 @@ export const TicketView = ({ job }: { job: Job }) => {
                 </div>
             </div>
 
-            <div className="mb-10">
-                <h2 className="text-4xl font-black tracking-tighter leading-none mb-4 uppercase">{job.title}</h2>
+            <div className="mb-6">
+                <h2 className="text-4xl font-black tracking-tighter leading-none mb-4 uppercase line-clamp-2 overflow-hidden text-ellipsis">{job.title}</h2>
                 <div className="flex items-center gap-2 text-gray-500">
                     <Building size={14} />
                     <span className="text-xs font-bold uppercase tracking-widest">{job.studioName}</span>
@@ -317,7 +316,7 @@ export const TicketView = ({ job }: { job: Job }) => {
             {/* THE QR CORE - INTERACTIVE */}
             <div 
                 onClick={handleScan}
-                className="relative group cursor-pointer mt-8"
+                className="relative group cursor-pointer mt-4"
             >
                 <div className="absolute -inset-4 bg-primary/20 blur-2xl rounded-full opacity-0 group-hover:opacity-100 transition-opacity"></div>
                 <div className="bg-white p-6 rounded-[32px] relative z-10 shadow-2xl transition-transform group-hover:scale-[1.02] group-active:scale-95">

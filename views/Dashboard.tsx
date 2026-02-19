@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { 
     Users, CreditCard, Loader2, Navigation, Zap, AlertTriangle, 
@@ -81,8 +80,8 @@ const TrainerPreviewModal = ({ trainer, jobId, onConfirm, onClose }: { trainer: 
                         </p>
                         
                         <div className="flex flex-wrap gap-2">
-                            {trainer.skills?.map(skill => (
-                                <span key={skill} className="px-3 py-1 bg-teal-500/10 border border-teal-500/20 rounded-full text-[10px] font-bold text-teal-400 uppercase tracking-wider">{skill}</span>
+                            {trainer.styles?.map(style => (
+                                <span key={style} className="px-3 py-1 bg-teal-500/10 border border-teal-500/20 rounded-full text-[10px] font-bold text-teal-400 uppercase tracking-wider">{style}</span>
                             ))}
                         </div>
                     </div>
@@ -428,45 +427,33 @@ export const TrainerCockpit = ({ user, myJobs, ownClasses = [], onNavigate, onCr
     const pendingReview = (myJobs || []).filter(j => j && j.status === 'COMPLETED' && !j.assigneeRated);
     
     return (
-        <div className="animate-fade-in pb-24 max-w-7xl mx-auto px-4 md:px-0">
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-                <div className="lg:col-span-2 space-y-12">
-                    {/* 0. FEEDBACK NUDGES FOR TRAINERS */}
-                    {pendingReview.length > 0 && (
-                        <section className="space-y-6">
-                            <div className="flex items-center justify-between px-2">
-                                <h2 className="text-sm font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
-                                    <Sparkles size={18} className="text-teal-400" /> Reputation Boost fällig
-                                </h2>
-                                <div className="h-px bg-white/5 flex-1 mx-6"></div>
-                            </div>
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                {pendingReview.map(job => (
-                                    <ReviewNudgeCard key={job.id} job={job} role="TRAINER" onRate={onRateStudio} />
-                                ))}
-                            </div>
-                        </section>
-                    )}
-
-                    <section className="space-y-8">
-                        <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Deine nächsten Gigs</h2>
-                        {activeJobs.length > 0 ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">{activeJobs.map(job => (<div key={job.id} className="space-y-4"><TicketView job={job} /><button onClick={() => onCancelJob(job)} className="w-full py-4 border border-white/5 hover:border-red-500/30 text-gray-600 hover:text-red-500 transition-all rounded-2xl text-[10px] font-black uppercase tracking-widest">Gig absagen</button></div>))}</div>
-                        ) : (
-                            <div className="py-20 border-2 border-dashed border-white/5 rounded-[40px] text-center opacity-30 font-black uppercase text-[10px] tracking-widest">Keine aktiven Buchungen</div>
-                        )}
+        <div className="animate-fade-in pb-24 max-w-4xl mx-auto px-4 md:px-0">
+            <div className="space-y-12">
+                {/* 0. FEEDBACK NUDGES FOR TRAINERS */}
+                {pendingReview.length > 0 && (
+                    <section className="space-y-6">
+                        <div className="flex items-center justify-between px-2">
+                            <h2 className="text-sm font-black text-white uppercase tracking-[0.3em] flex items-center gap-3">
+                                <Sparkles size={18} className="text-teal-400" /> Reputation Boost fällig
+                            </h2>
+                            <div className="h-px bg-white/5 flex-1 mx-6"></div>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            {pendingReview.map(job => (
+                                <ReviewNudgeCard key={job.id} job={job} role="TRAINER" onRate={onRateStudio} />
+                            ))}
+                        </div>
                     </section>
-                </div>
+                )}
 
-                <div className="space-y-6">
-                    <TrustLevelCard user={user} />
-                    <div className="bg-surfaceHighlight border border-white/5 rounded-[32px] p-8 text-center relative overflow-hidden group shadow-2xl">
-                        <div className="p-5 bg-teal-500/10 rounded-3xl text-teal-400 mb-6 inline-block"><Coins size={36}/></div>
-                        <div className="text-[10px] font-black text-gray-500 uppercase tracking-widest mb-2">Guthaben</div>
-                        <div className="text-5xl font-black font-mono text-white tracking-tighter mb-8">€<CountUp end={dynamicEarnings || 0} /></div>
-                        <button onClick={() => onNavigate('wallet')} className="w-full py-4 bg-white/5 border border-white/10 hover:bg-white hover:text-black rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all">Wallet öffnen</button>
-                    </div>
-                </div>
+                <section className="space-y-8">
+                    <h2 className="text-2xl font-black text-white uppercase tracking-tighter">Deine nächsten Gigs</h2>
+                    {activeJobs.length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">{activeJobs.map(job => (<div key={job.id} className="space-y-4"><TicketView job={job} /><button onClick={() => onCancelJob(job)} className="w-full py-4 border border-white/5 hover:border-red-500/30 text-gray-600 hover:text-red-500 transition-all rounded-2xl text-[10px] font-black uppercase tracking-widest">Gig absagen</button></div>))}</div>
+                    ) : (
+                        <div className="py-20 border-2 border-dashed border-white/5 rounded-[40px] text-center opacity-30 font-black uppercase text-[10px] tracking-widest">Keine aktiven Buchungen</div>
+                    )}
+                </section>
             </div>
         </div>
     );

@@ -1,6 +1,5 @@
-
 import React, { useState, useMemo } from 'react';
-import { Power, CheckCircle2 } from 'lucide-react';
+import { Power, CheckCircle2, ChevronDown, Zap } from 'lucide-react';
 import { UserProfile, Job, Story } from '../types';
 import { Sidebar, Header, MobileNavigation } from '../layout/Navigation';
 import { useTrainerData } from '../hooks/useTrainerData';
@@ -10,7 +9,7 @@ import { SmartCalendarView } from '../views/Calendars';
 import { TrainerWalletView } from '../views/Finance';
 import { MySpaceView } from '../views/MySpace';
 import { MessagingView } from '../views/Messaging';
-import { StoryViewer, LiveTrackingModal } from '../components/Modals';
+import { StoryViewer } from '../components/Modals';
 import { ReviewModal } from '../components/TrustSystem';
 import { supabase } from '../supabaseClient';
 
@@ -25,6 +24,10 @@ export const TrainerEngine = ({ user, onLogout, onToggleRole }: { user: UserProf
     const [activeStory, setActiveStory] = useState<Story | null>(null);
     const [notification, setNotification] = useState<string | null>(null);
     const [ratingJob, setRatingJob] = useState<Job | null>(null);
+
+    // NEU: States für die Expandable Lists
+    const [showOpenJobs, setShowOpenJobs] = useState(true);
+    const [showAppliedJobs, setShowAppliedJobs] = useState(false);
 
     const showNotification = (msg: string) => { setNotification(msg); setTimeout(() => setNotification(null), 4000); };
 
@@ -58,9 +61,13 @@ export const TrainerEngine = ({ user, onLogout, onToggleRole }: { user: UserProf
         return jobCategoryMatch || jobTitleMatch;
     };
 
-    const openJobs = useMemo(() => {
+    // GEÄNDERT: Aufteilung in available und applied
+    const matchedJobs = useMemo(() => {
         return jobs.filter(j => isJobMatching(j));
     }, [jobs, availability, user.skills]);
+
+    const availableJobs = useMemo(() => matchedJobs.filter(j => j.status === 'OPEN'), [matchedJobs]);
+    const appliedJobs = useMemo(() => matchedJobs.filter(j => j.status === 'APPLIED'), [matchedJobs]);
 
     const myGigs = useMemo(() => jobs.filter(j => j.assigneeId === user.id && j.status !== 'COMPLETED'), [jobs, user.id]);
     const earnings = useMemo(() => jobs.filter(j => j.assigneeId === user.id && j.status === 'COMPLETED').reduce((acc, j) => acc + (j.salary || j.totalFee || 0), 0), [jobs, user.id]);
@@ -124,9 +131,9 @@ export const TrainerEngine = ({ user, onLogout, onToggleRole }: { user: UserProf
                             <Power size={64} className={`relative z-10 transition-all duration-500 ${isRadarActive ? 'text-teal-400 drop-shadow-[0_0_15px_rgba(45,212,191,0.5)] scale-110' : 'text-gray-700'}`} />
                         </button>
                         
-                        {isRadarActive && openJobs.length > 0 && (
+                        {isRadarActive && matchedJobs.length > 0 && (
                             <button onClick={() => setActiveTab('find-jobs')} className="mt-16 px-12 py-5 bg-white text-black font-black rounded-3xl animate-bounce-up uppercase tracking-widest text-xs hover:bg-teal-400 transition-all shadow-[0_0_40px_rgba(255,255,255,0.1)]">
-                                Radar Treffer ({openJobs.length})
+                                Radar Treffer ({matchedJobs.length})
                             </button>
                         )}
                     </div>
@@ -134,7 +141,84 @@ export const TrainerEngine = ({ user, onLogout, onToggleRole }: { user: UserProf
 
                 {activeTab === 'cockpit' && <TrainerCockpit user={user} myJobs={jobs} dynamicEarnings={earnings} onNavigate={setActiveTab} onShowNotification={showNotification} onCancelJob={() => {}} onCreateEvent={() => {}} onOpenPreview={() => {}} onOpenManager={() => {}} onRateStudio={setRatingJob} />}
                 {activeTab === 'messages' && <MessagingView user={user} jobs={jobs} />}
-                {activeTab === 'find-jobs' && <JobMarketplace jobs={openJobs} onAccept={handleApply} />}
+                
+                {/* GEÄNDERT: Find Jobs View mit Expandable Sections */}
+                {activeTab === 'find-jobs' && (
+                    <div className="space-y-6 animate-fade-in max-w-6xl mx-auto">
+                        
+                        {/* 1. OPEN JOBS SECTION (Immer oben, standardmäßig offen) */}
+                        <div className="border border-white/10 rounded-3xl overflow-hidden bg-surfaceHighlight/30">
+                            <button 
+                                onClick={() => setShowOpenJobs(!showOpenJobs)}
+                                className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${showOpenJobs ? 'bg-teal-500 text-black' : 'bg-white/10 text-gray-400'}`}>
+                                        <Zap size={20} />
+                                    </div>
+                                    <div className="text-left">
+                                        <h3 className="text-lg font-black uppercase tracking-widest text-white group-hover:text-teal-400 transition-colors">
+                                            Available Gigs
+                                        </h3>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                                            Matches für deinen Style ({availableJobs.length})
+                                        </p>
+                                    </div>
+                                </div>
+                                <ChevronDown size={24} className={`text-gray-500 transition-transform duration-300 ${showOpenJobs ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {showOpenJobs && (
+                                <div className="p-6 pt-0 animate-fade-in">
+                                     {availableJobs.length > 0 ? (
+                                        <JobMarketplace jobs={availableJobs} onAccept={handleApply} />
+                                     ) : (
+                                        <div className="text-center py-12 border-t border-white/5">
+                                            <p className="text-gray-500 text-sm font-medium">Aktuell keine neuen Jobs im Radar.</p>
+                                        </div>
+                                     )}
+                                </div>
+                            )}
+                        </div>
+
+                        {/* 2. APPLIED JOBS SECTION (Darunter, standardmäßig geschlossen) */}
+                        <div className="border border-white/10 rounded-3xl overflow-hidden bg-surfaceHighlight/30 opacity-80 hover:opacity-100 transition-opacity">
+                            <button 
+                                onClick={() => setShowAppliedJobs(!showAppliedJobs)}
+                                className="w-full flex items-center justify-between p-6 hover:bg-white/5 transition-colors group"
+                            >
+                                <div className="flex items-center gap-4">
+                                    <div className={`w-10 h-10 rounded-xl flex items-center justify-center transition-colors ${showAppliedJobs ? 'bg-blue-500 text-white' : 'bg-white/10 text-gray-400'}`}>
+                                        <CheckCircle2 size={20} />
+                                    </div>
+                                    <div className="text-left">
+                                        <h3 className="text-lg font-black uppercase tracking-widest text-white group-hover:text-blue-400 transition-colors">
+                                            Sent Applications
+                                        </h3>
+                                        <p className="text-[10px] text-gray-500 font-bold uppercase tracking-wider">
+                                            Warten auf Rückmeldung ({appliedJobs.length})
+                                        </p>
+                                    </div>
+                                </div>
+                                <ChevronDown size={24} className={`text-gray-500 transition-transform duration-300 ${showAppliedJobs ? 'rotate-180' : ''}`} />
+                            </button>
+
+                            {showAppliedJobs && (
+                                <div className="p-6 pt-0 animate-fade-in">
+                                    {appliedJobs.length > 0 ? (
+                                        <JobMarketplace jobs={appliedJobs} onAccept={() => {}} />
+                                    ) : (
+                                        <div className="text-center py-12 border-t border-white/5">
+                                            <p className="text-gray-500 text-sm font-medium">Keine laufenden Bewerbungen.</p>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+                        </div>
+
+                    </div>
+                )}
+
                 {activeTab === 'schedule' && <SmartCalendarView jobs={myGigs} regularClasses={regularClasses} availability={availability} onToggleAvailability={handleToggleAvailability} />}
                 {activeTab === 'wallet' && <TrainerWalletView user={{...user, balance: earnings}} onUpdateProfile={() => {}} completedJobs={jobs.filter(j => j.status === 'COMPLETED')} />}
                 {activeTab === 'profile' && <MySpaceView user={user} onUpdateProfile={() => {}} />}

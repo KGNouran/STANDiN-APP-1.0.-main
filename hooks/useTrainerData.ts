@@ -44,7 +44,7 @@ export const useTrainerData = (baseTrainer: UserProfile) => {
             if (appsData) setMyApplications(appsData);
 
             // Fetch Profile for Availability (Radar Slots)
-            const { data: profile } = await supabase.from('users').select('radar_slots').eq('id', baseTrainer.id).single();
+            const { data: profile } = await supabase.from('users').select('radar_slots',).eq('id', baseTrainer.id).single();
             if (profile?.radar_slots) setAvailability(new Set(profile.radar_slots));
 
         } catch (err) { console.error("Trainer Data Fetch Error:", err); }
